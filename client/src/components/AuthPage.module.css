@@ -1,0 +1,294 @@
+/* ── Page shell — matches landing aesthetic ── */
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: #f9f8f6;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.glowTop {
+  position: fixed;
+  top: -180px; right: -100px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(168,85,247,0.1) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+
+.glowBottom {
+  position: fixed;
+  bottom: -180px; left: -100px;
+  width: 450px; height: 450px;
+  background: radial-gradient(circle, rgba(124,58,237,0.07) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+
+.backLink {
+  position: fixed;
+  top: 28px; left: 32px;
+  color: #999;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: color 0.2s;
+  z-index: 10;
+}
+.backLink:hover { color: #7c3aed; }
+
+/* ── Card ── */
+.card {
+  background: white;
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  padding: 32px 36px 36px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.08), 0 0 0 1px rgba(124,58,237,0.04);
+  position: relative;
+  z-index: 2;
+  animation: fadeSlideUp 0.45s ease both;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Card logo ── */
+.cardLogo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.cardLogoImg {
+  height: 32px; width: auto; object-fit: contain;
+}
+.cardLogoText {
+  display: flex; flex-direction: column; gap: 1px;
+}
+.cardLogoMark {
+  font-family: var(--font-display);
+  font-size: 0.82rem; font-weight: 900;
+  letter-spacing: 0.14em; color: #1a1a1a; line-height: 1;
+}
+.cardLogoSub {
+  font-size: 0.68rem; font-weight: 600;
+  color: #9333ea; letter-spacing: 0.04em; line-height: 1;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: grid; grid-template-columns: 1fr 1fr;
+  background: #f3f0eb; border-radius: 10px;
+  padding: 3px; margin-bottom: 28px; position: relative;
+}
+.tab {
+  background: none; border: none;
+  color: #888; padding: 9px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.82rem; font-weight: 700;
+  letter-spacing: 0.04em; cursor: pointer;
+  transition: color 0.25s; position: relative; z-index: 2;
+}
+.tab.tabActive { color: white; }
+.tabIndicator {
+  position: absolute; top: 3px; left: 3px;
+  width: calc(50% - 3px); height: calc(100% - 6px);
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  border-radius: 8px;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1;
+  box-shadow: 0 3px 10px rgba(124,58,237,0.3);
+}
+
+/* ── Form inner ── */
+.formWrap { overflow: hidden; }
+.formInner { display: flex; flex-direction: column; gap: 16px; }
+
+.iconBadge { font-size: 2rem; text-align: center; }
+
+.formTitle {
+  font-family: var(--font-display);
+  font-size: 1.2rem; font-weight: 800;
+  color: #1a1a1a; letter-spacing: 0.01em;
+  margin-bottom: 2px;
+}
+.formSub { color: #888; font-size: 0.87rem; line-height: 1.6; }
+.formSub strong { color: #555; }
+
+/* ── Alerts ── */
+.errorBanner {
+  background: #fff1f0; border: 1px solid #fca5a5;
+  color: #b91c1c; padding: 11px 14px;
+  border-radius: 9px; font-size: 0.86rem; font-weight: 600;
+  animation: fadeSlideUp 0.25s ease;
+}
+.successBanner {
+  background: #f0fdf4; border: 1px solid #86efac;
+  color: #15803d; padding: 11px 14px;
+  border-radius: 9px; font-size: 0.86rem; font-weight: 600;
+  animation: fadeSlideUp 0.25s ease;
+}
+
+/* ── Fields ── */
+.field { display: flex; flex-direction: column; gap: 5px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.label {
+  font-size: 0.74rem; font-weight: 700;
+  color: #555; letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+.input {
+  background: #faf9f7;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  color: #1a1a1a;
+  padding: 10px 13px;
+  border-radius: 9px;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+}
+.input::placeholder { color: #bbb; }
+.input:focus {
+  outline: none;
+  border-color: #a855f7;
+  box-shadow: 0 0 0 3px rgba(168,85,247,0.1);
+  background: white;
+}
+.input option { background: white; color: #1a1a1a; }
+
+/* ── Password ── */
+.passWrap { position: relative; }
+.passWrap .input { padding-right: 42px; }
+.passToggle {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  font-size: 0.95rem; opacity: 0.5; transition: opacity 0.2s;
+}
+.passToggle:hover { opacity: 1; }
+
+/* ── Strength ── */
+.strengthRow { display: flex; align-items: center; gap: 7px; margin-top: 3px; }
+.strengthDot { width: 7px; height: 7px; border-radius: 50%; }
+.strengthLabel { font-size: 0.74rem; font-weight: 700; }
+.strengthWeak  { background: #ef4444; color: #ef4444; }
+.strengthFair  { background: #f59e0b; color: #f59e0b; }
+.strengthStrong{ background: #22c55e; color: #22c55e; }
+
+.matchOk  { font-size: 0.76rem; font-weight: 600; color: #16a34a; margin-top: 2px; }
+.matchBad { font-size: 0.76rem; font-weight: 600; color: #dc2626; margin-top: 2px; }
+
+/* ── Terms ── */
+.termsRow {
+  display: flex; align-items: center; gap: 9px;
+  cursor: pointer; font-size: 0.86rem; color: #666;
+  user-select: none;
+}
+.checkbox { width: 17px; height: 17px; accent-color: #7c3aed; cursor: pointer; flex-shrink: 0; }
+
+/* ── Forgot link ── */
+.forgotLink {
+  background: none; border: none;
+  color: #9333ea; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; text-align: right;
+  padding: 0; margin-top: -6px; align-self: flex-end;
+  transition: opacity 0.2s;
+}
+.forgotLink:hover { opacity: 0.7; }
+
+/* ── Submit ── */
+.submitBtn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  border: none; color: white;
+  padding: 13px; border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 700;
+  letter-spacing: 0.03em; cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(124,58,237,0.25);
+  margin-top: 4px;
+}
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(124,58,237,0.38);
+}
+.submitBtn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+
+.spinner {
+  width: 15px; height: 15px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Switch / links ── */
+.switchText { text-align: center; color: #999; font-size: 0.84rem; }
+.linkBtn {
+  background: none; border: none;
+  color: #7c3aed; font-size: inherit;
+  font-family: inherit; font-weight: 700;
+  cursor: pointer; transition: opacity 0.2s;
+}
+.linkBtn:hover { opacity: 0.7; }
+
+/* ── Verification code boxes ── */
+.codeBoxes {
+  display: flex; gap: 8px; justify-content: center;
+  margin: 4px 0;
+}
+.codeBox {
+  width: 46px; height: 54px;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  border-radius: 10px;
+  background: #faf9f7;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.3rem; font-weight: 700; color: #1a1a1a;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.codeBox:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 3px rgba(168,85,247,0.12);
+  background: white;
+}
+
+/* ── Resend row ── */
+.resendRow { text-align: center; color: #999; font-size: 0.84rem; }
+.cooldown { color: #bbb; font-weight: 600; font-size: 0.82rem; }
+
+/* ── Back button ── */
+.backBtn {
+  background: none; border: none;
+  color: #999; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; padding: 0; align-self: flex-start;
+  transition: color 0.2s;
+}
+.backBtn:hover { color: #7c3aed; }
+
+@media (max-width: 540px) {
+  .card { padding: 24px 18px 28px; }
+  .row2 { grid-template-columns: 1fr; }
+  .codeBox { width: 40px; height: 48px; font-size: 1.1rem; }
+}
