@@ -13,6 +13,44 @@ const JWT_SECRET = process.env.JWT_SECRET || 'robotics_secret_change_in_prod';
 const CODE_TTL_MS = 10 * 60 * 1000;
 const RESEND_WAIT_MS = 30 * 1000;
 
+// ─── Validation ───────────────────────────────────────────────────────────────
+const VALID_GRADE_LEVELS = [
+  '1st Grade','2nd Grade','3rd Grade','4th Grade','5th Grade',
+  '6th Grade','7th Grade','8th Grade','9th Grade',
+];
+const VALID_STATES = [
+  'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut',
+  'Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa',
+  'Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan',
+  'Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire',
+  'New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio',
+  'Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota',
+  'Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia',
+  'Wisconsin','Wyoming',
+];
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const NAME_REGEX  = /^[a-zA-Z\s'\-]{1,30}$/;
+const TOWN_REGEX  = /^[a-zA-Z\s'\-\.]{1,30}$/;
+
+function validateSignup({ firstName, lastName, age, gradeLevel, town, state, email, password }) {
+  if (!firstName || firstName.length > 30)    return 'First name must be 1–30 characters.';
+  if (!NAME_REGEX.test(firstName))             return 'First name contains invalid characters.';
+  if (!lastName || lastName.length > 30)       return 'Last name must be 1–30 characters.';
+  if (!NAME_REGEX.test(lastName))              return 'Last name contains invalid characters.';
+  const ageNum = parseInt(age);
+  if (isNaN(ageNum) || ageNum < 1 || ageNum > 99) return 'Age must be a number between 1 and 99.';
+  if (!VALID_GRADE_LEVELS.includes(gradeLevel))    return 'Invalid grade level.';
+  if (!town || town.length > 30)               return 'Town must be 1–30 characters.';
+  if (!TOWN_REGEX.test(town))                  return 'Town contains invalid characters.';
+  if (!VALID_STATES.includes(state))           return 'Invalid state.';
+  if (!email || email.length > 30)             return 'Email must be 30 characters or fewer.';
+  if (!EMAIL_REGEX.test(email))                return 'Invalid email address.';
+  if (typeof password !== 'string' || password.length < 8) return 'Password must be at least 8 characters.';
+  if (password.length > 30)                    return 'Password must be 30 characters or fewer.';
+  return null;
+}
+
+// ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
 app.use(express.json());
 
@@ -26,11 +64,12 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+// ─── Health ───────────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'RoboLeague API is running' });
+  res.json({ status: 'ok', message: 'PRPL outreach API is running' });
 });
 
-// SIGN UP
+// ─── SIGN UP ──────────────────────────────────────────────────────────────────
 app.post('/api/auth/signup', async (req, res) => {
   const { firstName, lastName, age, gradeLevel, town, state, email, password, termsAccepted } = req.body;
 
@@ -38,8 +77,9 @@ app.post('/api/auth/signup', async (req, res) => {
     return res.status(400).json({ error: 'All fields are required.' });
   if (!termsAccepted)
     return res.status(400).json({ error: 'You must accept the terms and conditions.' });
-  if (password.length < 8)
-    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+
+  const validationError = validateSignup({ firstName, lastName, age, gradeLevel, town, state, email, password });
+  if (validationError) return res.status(400).json({ error: validationError });
 
   try {
     const existing = await prisma.student.findUnique({ where: { email: email.toLowerCase() } });
@@ -59,7 +99,8 @@ app.post('/api/auth/signup', async (req, res) => {
       await prisma.student.update({
         where: { email: email.toLowerCase() },
         data: {
-          firstName, lastName, age, gradeLevel, town, state, passwordHash, termsAccepted,
+          firstName, lastName, age: parseInt(age), gradeLevel, town, state,
+          passwordHash, termsAccepted,
           verifyCode: code,
           verifyCodeExpiresAt: new Date(now.getTime() + CODE_TTL_MS),
           verifyCodeSentAt: now,
@@ -68,7 +109,7 @@ app.post('/api/auth/signup', async (req, res) => {
     } else {
       await prisma.student.create({
         data: {
-          firstName, lastName, age, gradeLevel, town, state,
+          firstName, lastName, age: parseInt(age), gradeLevel, town, state,
           email: email.toLowerCase(),
           passwordHash, termsAccepted,
           isVerified: false,
@@ -92,10 +133,12 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 });
 
-// VERIFY EMAIL
+// ─── VERIFY EMAIL ─────────────────────────────────────────────────────────────
 app.post('/api/auth/verify', async (req, res) => {
   const { email, code } = req.body;
   if (!email || !code) return res.status(400).json({ error: 'Email and code are required.' });
+  if (!EMAIL_REGEX.test(email)) return res.status(400).json({ error: 'Invalid email address.' });
+  if (!/^\d{6}$/.test(code)) return res.status(400).json({ error: 'Invalid code format.' });
 
   try {
     const student = await prisma.student.findUnique({ where: { email: email.toLowerCase() } });
@@ -136,10 +179,10 @@ app.post('/api/auth/verify', async (req, res) => {
   }
 });
 
-// RESEND VERIFY CODE
+// ─── RESEND VERIFY CODE ───────────────────────────────────────────────────────
 app.post('/api/auth/resend-verify', async (req, res) => {
   const { email } = req.body;
-  if (!email) return res.status(400).json({ error: 'Email is required.' });
+  if (!email || !EMAIL_REGEX.test(email)) return res.status(400).json({ error: 'Valid email is required.' });
 
   try {
     const student = await prisma.student.findUnique({ where: { email: email.toLowerCase() } });
@@ -170,10 +213,13 @@ app.post('/api/auth/resend-verify', async (req, res) => {
   }
 });
 
-// LOGIN
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required.' });
+  if (!EMAIL_REGEX.test(email) || email.length > 30) return res.status(400).json({ error: 'Invalid email address.' });
+  if (typeof password !== 'string' || password.length > 30)
+    return res.status(400).json({ error: 'Invalid password.' });
 
   try {
     const student = await prisma.student.findUnique({ where: { email: email.toLowerCase() } });
@@ -214,10 +260,11 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// FORGOT PASSWORD
+// ─── FORGOT PASSWORD ──────────────────────────────────────────────────────────
 app.post('/api/auth/forgot-password', async (req, res) => {
   const { email } = req.body;
-  if (!email) return res.status(400).json({ error: 'Email is required.' });
+  if (!email || !EMAIL_REGEX.test(email) || email.length > 30)
+    return res.status(400).json({ error: 'Valid email is required.' });
 
   try {
     const student = await prisma.student.findUnique({ where: { email: email.toLowerCase() } });
@@ -249,13 +296,19 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   }
 });
 
-// RESET PASSWORD
+// ─── RESET PASSWORD ───────────────────────────────────────────────────────────
 app.post('/api/auth/reset-password', async (req, res) => {
   const { email, code, newPassword } = req.body;
   if (!email || !code || !newPassword)
     return res.status(400).json({ error: 'All fields are required.' });
-  if (newPassword.length < 8)
+  if (!EMAIL_REGEX.test(email) || email.length > 30)
+    return res.status(400).json({ error: 'Invalid email address.' });
+  if (!/^\d{6}$/.test(code))
+    return res.status(400).json({ error: 'Invalid code format.' });
+  if (typeof newPassword !== 'string' || newPassword.length < 8)
     return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+  if (newPassword.length > 30)
+    return res.status(400).json({ error: 'Password must be 30 characters or fewer.' });
 
   try {
     const student = await prisma.student.findUnique({ where: { email: email.toLowerCase() } });
@@ -278,7 +331,7 @@ app.post('/api/auth/reset-password', async (req, res) => {
   }
 });
 
-// GET ME
+// ─── GET ME ───────────────────────────────────────────────────────────────────
 app.get('/api/auth/me', authenticateToken, async (req, res) => {
   try {
     const student = await prisma.student.findUnique({
@@ -296,6 +349,7 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
   }
 });
 
+// ─── Start ────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`PRPL outreach server running on http://localhost:${PORT}`);
+  console.log(`🚀 PRPL outreach server running on http://localhost:${PORT}`);
 });
