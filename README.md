@@ -47,3 +47,10 @@ npm run dev
 ```
 
 Open **http://localhost:5173** in your browser.
+
+## Current Features (as of 4/1/2026)
+-  Landing Page
+-  Signup / Login Page
+-  Terms and Services Modal
+-  Dashboard Placeholder
+-  Email verification + Reset Password
