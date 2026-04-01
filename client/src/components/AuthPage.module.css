@@ -180,9 +180,11 @@
 .passToggle {
   position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
   background: none; border: none; cursor: pointer;
-  font-size: 0.95rem; opacity: 0.5; transition: opacity 0.2s;
+  color: #aaa; transition: color 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  padding: 2px;
 }
-.passToggle:hover { opacity: 1; }
+.passToggle:hover { color: #7c3aed; }
 
 /* ── Strength ── */
 .strengthRow { display: flex; align-items: center; gap: 7px; margin-top: 3px; }
