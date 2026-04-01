@@ -15,7 +15,10 @@ const US_STATES = [
   'Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia',
   'Wisconsin','Wyoming',
 ];
-const GRADE_LEVELS = ['1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade','7th Grade','8th Grade','9th Grade'];
+const GRADE_LEVELS = [
+  '1st Grade','2nd Grade','3rd Grade','4th Grade','5th Grade',
+  '6th Grade','7th Grade','8th Grade','9th Grade',
+];
 
 function useResendTimer() {
   const [seconds, setSeconds] = useState(0);
@@ -125,6 +128,7 @@ function ForgotScreen({ onBack }) {
 
   const handleRequest = async () => {
     if (!email) return setError('Please enter your email.');
+    if (email.length > 30) return setError('Email must be 30 characters or fewer.');
     setError(''); setLoading(true);
     try { await api.forgotPassword(email); start(); setStep('code'); }
     catch (err) { setError(err.message); }
@@ -139,6 +143,7 @@ function ForgotScreen({ onBack }) {
 
   const handleReset = async () => {
     if (newPassword.length < 8) return setError('Password must be at least 8 characters.');
+    if (newPassword.length > 30) return setError('Password must be 30 characters or fewer.');
     if (newPassword !== confirmPassword) return setError('Passwords do not match.');
     setError(''); setLoading(true);
     try { await api.resetPassword(email, code, newPassword); setStep('done'); }
@@ -171,7 +176,7 @@ function ForgotScreen({ onBack }) {
           <div className={styles.field}>
             <label className={styles.label}>Email address</label>
             <input className={styles.input} type="email" placeholder="you@school.edu"
-              value={email} onChange={e => setEmail(e.target.value)}/>
+              maxLength={30} value={email} onChange={e => setEmail(e.target.value)}/>
           </div>
           <button className={styles.submitBtn} onClick={handleRequest} disabled={loading}>
             {loading ? <span className={styles.spinner}/> : null}
@@ -186,7 +191,8 @@ function ForgotScreen({ onBack }) {
             <label className={styles.label}>Reset code</label>
             <CodeInput value={code} onChange={setCode}/>
           </div>
-          <button className={styles.submitBtn} onClick={() => { if (code.length < 6) return setError('Enter the full 6-digit code.'); setError(''); setStep('newpass'); }}
+          <button className={styles.submitBtn}
+            onClick={() => { if (code.length < 6) return setError('Enter the full 6-digit code.'); setError(''); setStep('newpass'); }}
             disabled={code.length < 6}>Continue</button>
           <p className={styles.resendRow}>
             Didn't get it?{' '}
@@ -203,7 +209,8 @@ function ForgotScreen({ onBack }) {
             <label className={styles.label}>New password</label>
             <div className={styles.passWrap}>
               <input className={styles.input} type={showPass ? 'text' : 'password'}
-                placeholder="At least 8 characters" value={newPassword} onChange={e => setNewPassword(e.target.value)}/>
+                placeholder="At least 8 characters" maxLength={30}
+                value={newPassword} onChange={e => setNewPassword(e.target.value)}/>
               <button type="button" className={styles.passToggle} onClick={() => setShowPass(v => !v)}>
                 {showPass ? '🙈' : '👁️'}
               </button>
@@ -212,7 +219,7 @@ function ForgotScreen({ onBack }) {
           <div className={styles.field}>
             <label className={styles.label}>Confirm password</label>
             <input className={styles.input} type="password" placeholder="Re-enter password"
-              value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}/>
+              maxLength={30} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}/>
             {confirmPassword && (
               <span className={newPassword === confirmPassword ? styles.matchOk : styles.matchBad}>
                 {newPassword === confirmPassword ? '✓ Passwords match' : "✗ Passwords don't match"}
@@ -263,13 +270,13 @@ function LoginForm({ onSwitch }) {
         <div className={styles.field}>
           <label className={styles.label}>Email address</label>
           <input className={styles.input} type="email" placeholder="you@school.edu"
-            value={email} onChange={e => setEmail(e.target.value)} autoComplete="email"/>
+            maxLength={30} value={email} onChange={e => setEmail(e.target.value)} autoComplete="email"/>
         </div>
         <div className={styles.field}>
           <label className={styles.label}>Password</label>
           <div className={styles.passWrap}>
             <input className={styles.input} type={showPass ? 'text' : 'password'} placeholder="••••••••"
-              value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password"/>
+              maxLength={30} value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password"/>
             <button type="button" className={styles.passToggle} onClick={() => setShowPass(v => !v)}>
               {showPass ? '🙈' : '👁️'}
             </button>
@@ -304,21 +311,19 @@ function SignupForm({ onSwitch }) {
 
   const set = f => e => setForm(prev => ({ ...prev, [f]: e.target.value }));
 
-  const strength = (() => {
-    const p = form.password;
-    if (!p) return null;
-    if (p.length < 8)  return { label: 'Too short', cls: styles.strengthWeak };
-    if (p.length < 12) return { label: 'Fair', cls: styles.strengthFair };
-    return { label: 'Strong', cls: styles.strengthStrong };
-  })();
-
   const validate = () => {
-    const { firstName,lastName,age,gradeLevel,town,state,email,password,confirmPassword } = form;
-    if (!firstName||!lastName||!age||!gradeLevel||!town||!state||!email||!password) return 'Please fill in all fields.';
-    if (parseInt(age) < 1 || parseInt(age) > 99) return 'Please enter an age (1–99).';
-    if (password.length < 8) return 'Password must be at least 8 characters.';
+    const { firstName, lastName, age, gradeLevel, town, state, email, password, confirmPassword } = form;
+    if (!firstName || !lastName || !age || !gradeLevel || !town || !state || !email || !password)
+      return 'Please fill in all fields.';
+    if (firstName.length > 30)  return 'First name must be 30 characters or fewer.';
+    if (lastName.length > 30)   return 'Last name must be 30 characters or fewer.';
+    if (town.length > 30)       return 'Town must be 30 characters or fewer.';
+    if (email.length > 30)      return 'Email must be 30 characters or fewer.';
+    if (parseInt(age) < 1 || parseInt(age) > 99) return 'Please enter a valid age (1–99).';
+    if (password.length < 8)    return 'Password must be at least 8 characters.';
+    if (password.length > 30)   return 'Password must be 30 characters or fewer.';
     if (password !== confirmPassword) return 'Passwords do not match.';
-    if (!termsAccepted) return 'Please accept the Terms & Conditions.';
+    if (!termsAccepted)         return 'Please accept the Terms & Conditions.';
     return null;
   };
 
@@ -344,18 +349,23 @@ function SignupForm({ onSwitch }) {
           <div className={styles.row2}>
             <div className={styles.field}>
               <label className={styles.label}>First name</label>
-              <input className={styles.input} placeholder="Ada" value={form.firstName} onChange={set('firstName')}/>
+              <input className={styles.input} placeholder="Ada" maxLength={30}
+                value={form.firstName} onChange={set('firstName')}/>
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Last name</label>
-              <input className={styles.input} placeholder="Lovelace" value={form.lastName} onChange={set('lastName')}/>
+              <input className={styles.input} placeholder="Lovelace" maxLength={30}
+                value={form.lastName} onChange={set('lastName')}/>
             </div>
           </div>
           <div className={styles.row2}>
             <div className={styles.field}>
               <label className={styles.label}>Age</label>
-              <input className={styles.input} type="number" min="1" max="99" placeholder="12"
-                value={form.age} onChange={set('age')}/>
+              <input className={styles.input} type="text" inputMode="numeric" placeholder="12"
+                maxLength={3} value={form.age} onChange={e => {
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 3);
+                  setForm(prev => ({ ...prev, age: val }));
+                }}/>
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Grade level</label>
@@ -368,7 +378,8 @@ function SignupForm({ onSwitch }) {
           <div className={styles.row2}>
             <div className={styles.field}>
               <label className={styles.label}>Town / City</label>
-              <input className={styles.input} placeholder="Princeton" value={form.town} onChange={set('town')}/>
+              <input className={styles.input} placeholder="Princeton" maxLength={30}
+                value={form.town} onChange={set('town')}/>
             </div>
             <div className={styles.field}>
               <label className={styles.label}>State</label>
@@ -381,28 +392,23 @@ function SignupForm({ onSwitch }) {
           <div className={styles.field}>
             <label className={styles.label}>Email address</label>
             <input className={styles.input} type="email" placeholder="you@school.edu"
-              value={form.email} onChange={set('email')} autoComplete="email"/>
+              maxLength={30} value={form.email} onChange={set('email')} autoComplete="email"/>
           </div>
           <div className={styles.field}>
             <label className={styles.label}>Password</label>
             <div className={styles.passWrap}>
-              <input className={styles.input} type={showPass ? 'text' : 'password'} placeholder="At least 8 characters"
+              <input className={styles.input} type={showPass ? 'text' : 'password'}
+                placeholder="At least 8 characters" maxLength={30}
                 value={form.password} onChange={set('password')} autoComplete="new-password"/>
               <button type="button" className={styles.passToggle} onClick={() => setShowPass(v => !v)}>
                 {showPass ? '🙈' : '👁️'}
               </button>
             </div>
-            {strength && (
-              <div className={styles.strengthRow}>
-                <span className={`${styles.strengthDot} ${strength.cls}`}/>
-                <span className={`${styles.strengthLabel} ${strength.cls}`}>{strength.label}</span>
-              </div>
-            )}
           </div>
           <div className={styles.field}>
             <label className={styles.label}>Confirm password</label>
             <input className={styles.input} type="password" placeholder="Re-enter password"
-              value={form.confirmPassword} onChange={set('confirmPassword')} autoComplete="new-password"/>
+              maxLength={30} value={form.confirmPassword} onChange={set('confirmPassword')} autoComplete="new-password"/>
             {form.confirmPassword && (
               <span className={form.password === form.confirmPassword ? styles.matchOk : styles.matchBad}>
                 {form.password === form.confirmPassword ? '✓ Passwords match' : "✗ Passwords don't match"}
@@ -453,8 +459,10 @@ export default function AuthPage() {
           </div>
         </div>
         <div className={styles.tabs}>
-          <button className={`${styles.tab} ${tab==='login' ? styles.tabActive : ''}`} onClick={() => switchTab('login')}>Log in</button>
-          <button className={`${styles.tab} ${tab==='signup' ? styles.tabActive : ''}`} onClick={() => switchTab('signup')}>Sign up</button>
+          <button className={`${styles.tab} ${tab==='login' ? styles.tabActive : ''}`}
+            onClick={() => switchTab('login')}>Log in</button>
+          <button className={`${styles.tab} ${tab==='signup' ? styles.tabActive : ''}`}
+            onClick={() => switchTab('signup')}>Sign up</button>
           <div className={styles.tabIndicator} style={{transform:`translateX(${tab==='signup'?'100%':'0%'})`}}/>
         </div>
         <div className={styles.formWrap}>
