@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤖 RoboHelper Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --coral:   #ff6b6b;
+  --teal:    #26c6b9;
+  --purple:  #9b72cf;
+  --amber:   #f5a623;
+  --green:   #2ecc71;
+  --bg:      #f0f3ff;
+  --panel:   #ffffff;
+  --border:  #e2e8f0;
+  --text:    #1e293b;
+  --muted:   #7b8fb5;
+  --indigo:  #5c6bc0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--text);
+  min-width: 900px;
+}
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(120deg, #3a1c71, #d76d77, #ffaf7b);
+  background-size: 300% 300%;
+  animation: gradShift 8s ease infinite;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  box-shadow: 0 3px 20px rgba(0,0,0,0.25);
+}
+@keyframes gradShift {
+  0%,100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+.logo { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+.header-center { text-align: center; }
+.level-title { font-size: 1rem; font-weight: 800; }
+.star-row { font-size: 1.3rem; letter-spacing: 3px; }
+.coin-display { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.coin-display span { font-size: 1.4rem; }
+
+/* ── MAIN LAYOUT ── */
+.main {
+  display: grid;
+  grid-template-columns: 200px 1fr 340px;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── GENERIC PANEL ── */
+.panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+  background: var(--panel);
+}
+.panel-hdr {
+  padding: 9px 14px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  background: #fafbff;
+  flex-shrink: 0;
+}
+
+/* ── PALETTE ── */
+.palette {
+  padding: 10px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.pal-block {
+  border: none;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  width: 100%;
+  text-align: left;
+  transition: transform .12s, box-shadow .12s;
+  position: relative;
+}
+.pal-block:hover:not(.locked) { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,.2); }
+.pal-block:active:not(.locked) { transform: translateY(0); }
+.pal-block.move    { background: var(--coral); }
+.pal-block.gripper { background: var(--teal); }
+.pal-block.control { background: var(--purple); }
+.pal-block.locked  { background: #cbd5e1; color: #94a3b8; cursor: default; }
+.pal-sep { height: 1px; background: var(--border); margin: 4px 0; }
+.pal-section-label { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); padding: 2px 2px; }
+.lock-tag { font-size: 0.65rem; background: rgba(0,0,0,.15); border-radius: 8px; padding: 2px 6px; margin-left: auto; }
+
+/* ── WORKSPACE ── */
+.workspace {
+  padding: 10px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.empty-ws {
+  flex: 1;
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  text-align: center;
+  gap: 8px;
+  padding: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.empty-ws .big { font-size: 2.2rem; }
+
+.prog-block {
+  border-radius: 9px;
+  padding: 8px 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border: 2.5px solid;
+  animation: slideIn .18s ease;
+  user-select: none;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.prog-block.move    { border-color: var(--coral);  color: var(--coral); }
+.prog-block.gripper { border-color: var(--teal);   color: var(--teal); }
+.prog-block.control { border-color: var(--purple); color: var(--purple); }
+.prog-block.indent  { margin-left: 20px; border-style: dashed; }
+.prog-block.active  { box-shadow: 0 0 0 3px var(--amber), 0 0 12px rgba(245,166,35,.4); }
+
+.step-num {
+  background: #f1f5f9;
+  border-radius: 50%;
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.68rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.rm-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #cbd5e1;
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: 4px;
+  padding: 1px 4px;
+  transition: color .12s;
+}
+.rm-btn:hover { color: var(--coral); }
+
+.prog-block select, .prog-block input[type=number] {
+  border-radius: 6px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  outline: none;
+  cursor: pointer;
+}
+.prog-block.move select {
+  background: rgba(255,107,107,.1);
+  border: 1.5px solid rgba(255,107,107,.35);
+  color: var(--coral);
+}
+.prog-block.control select,
+.prog-block.control input {
+  background: rgba(155,114,207,.1);
+  border: 1.5px solid rgba(155,114,207,.35);
+  color: var(--purple);
+  width: 48px;
+  text-align: center;
+}
+
+/* ── ROBOT PANEL ── */
+.robot-panel {
+  border-right: none;
+  border-left: 1px solid var(--border);
+  background: #f7f9ff;
+}
+#robotCanvas { width: 340px; display: block; flex-shrink: 0; }
+.goal-card {
+  margin: 10px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg,#fffbea,#fffef7);
+  border: 2px solid var(--amber);
+  border-radius: 12px;
+}
+.goal-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--amber);
+  margin-bottom: 4px;
+}
+#goalText { font-size: 0.84rem; font-weight: 600; line-height: 1.5; color: var(--text); }
+.hint-row { margin: 0 10px 10px; font-size: 0.78rem; color: var(--muted); font-weight: 600; display: flex; gap: 6px; align-items: flex-start; }
+
+/* ── FOOTER ── */
+.footer {
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.btn {
+  border: none; border-radius: 9px;
+  padding: 9px 18px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .12s, box-shadow .12s;
+  display: flex; align-items: center; gap: 5px;
+}
+.btn:hover:not(:disabled) { transform: translateY(-2px); }
+.btn:active:not(:disabled) { transform: translateY(0); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn-run   { background: var(--green); color: white; box-shadow: 0 4px 12px rgba(46,204,113,.35); }
+.btn-reset { background: var(--amber); color: white; box-shadow: 0 4px 12px rgba(245,166,35,.3); }
+.btn-clear { background: #f1f5f9; color: var(--muted); }
+.feedback {
+  margin-left: auto;
+  font-size: 0.88rem; font-weight: 700;
+  padding: 7px 14px; border-radius: 8px; display: none;
+}
+.feedback.ok  { background: #d1fae5; color: #059669; display: block; }
+.feedback.err { background: #fee2e2; color: #dc2626; display: block; }
+
+/* ── MODAL ── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(20,20,40,.55);
+  display: none; align-items: center; justify-content: center;
+  z-index: 200;
+  backdrop-filter: blur(6px);
+}
+.overlay.show { display: flex; }
+.modal {
+  background: white;
+  border-radius: 22px;
+  padding: 36px 40px;
+  max-width: 380px; width: 90%;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0,0,0,.3);
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn {
+  from { opacity:0; transform: scale(.7); }
+  to   { opacity:1; transform: scale(1); }
+}
+.modal-icon  { font-size: 4rem; margin-bottom: 12px; }
+.modal-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 8px; }
+.modal-body  { color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 18px; font-weight: 600; }
+.modal-reward {
+  background: #fffbea; border: 2px solid var(--amber);
+  border-radius: 12px; padding: 12px; margin-bottom: 20px;
+  font-size: 1.1rem; font-weight: 800; color: #b45309;
+  white-space: pre-line;
+}
+.modal-btn {
+  border: none; border-radius: 12px;
+  padding: 13px 28px;
+  font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 800;
+  cursor: pointer; width: 100%;
+  transition: transform .15s, box-shadow .15s;
+}
+.modal-btn:hover { transform: translateY(-2px); }
+.modal-btn.primary { background: linear-gradient(135deg,#667eea,#764ba2); color: white; box-shadow: 0 8px 24px rgba(102,126,234,.4); }
+.modal-btn.danger  { background: var(--coral); color: white; }
+
+/* Running state */
+body.running .btn-run { pointer-events: none; }
+
+/* Level transition flash */
+.flash { animation: flashAnim .5s ease; }
+@keyframes flashAnim {
+  0%,100% { opacity:1; }
+  50%      { opacity:.3; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">🤖 RoboHelper Academy</div>
+  <div class="header-center">
+    <div class="level-title" id="levelTitle">Level 1: Hello, Robot!</div>
+    <div class="star-row" id="starRow">⭐☆☆☆</div>
+  </div>
+  <div class="coin-display"><span>🪙</span> <span id="coinCount">0</span> coins</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT: Palette -->
+  <div class="panel">
+    <div class="panel-hdr">🧩 Blocks</div>
+    <div class="palette" id="palette"></div>
+  </div>
+
+  <!-- CENTER: Workspace -->
+  <div class="panel">
+    <div class="panel-hdr">📋 My Program</div>
+    <div class="workspace" id="workspace"></div>
+  </div>
+
+  <!-- RIGHT: Robot -->
+  <div class="panel robot-panel">
+    <div class="panel-hdr">🦾 Robot View</div>
+    <canvas id="robotCanvas" width="340" height="262"></canvas>
+    <div class="goal-card">
+      <div class="goal-label">🎯 Goal</div>
+      <div id="goalText"></div>
+    </div>
+    <div class="hint-row" id="hintRow"></div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <button class="btn btn-run"   id="runBtn"   onclick="runProgram()">▶ Run</button>
+  <button class="btn btn-reset" id="resetBtn" onclick="resetLevel()">↺ Reset</button>
+  <button class="btn btn-clear"               onclick="clearProgram()">🗑 Clear</button>
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<!-- WIN MODAL -->
+<div class="overlay" id="winOverlay">
+  <div class="modal">
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title" id="winTitle">Level Complete!</div>
+    <div class="modal-body"  id="winBody"></div>
+    <div class="modal-reward" id="winReward">+20 🪙</div>
+    <button class="modal-btn primary" id="nextBtn" onclick="nextLevel()">Next Level →</button>
+  </div>
+</div>
+
+<!-- FAIL MODAL -->
+<div class="overlay" id="failOverlay">
+  <div class="modal">
+    <div class="modal-icon">🤔</div>
+    <div class="modal-title">Not quite!</div>
+    <div class="modal-body" id="failBody">Your program didn't finish the goal. Check the hint and try again!</div>
+    <button class="modal-btn danger" onclick="closeOverlay('failOverlay')">Try Again</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   GAME STATE
+═══════════════════════════════════════════════ */
+const G = {
+  level: 0,
+  coins: 0,
+  program: [],     // array of block objects
+  robot: {},       // robot logical state
+  objects: {},     // world object states
+  running: false,
+};
+
+/* ═══════════════════════════════════════════════
+   ARM CONSTANTS & POSITIONS
+═══════════════════════════════════════════════ */
+const CW = 340, CH = 262;
+const BX = 170, BY = 230;   // arm base pixel
+const L1 = 95, L2 = 78;     // segment lengths
+
+// Named arm positions {t1, t2} in radians
+// t1 = upper-arm angle from straight-up (clockwise positive)
+// t2 = forearm angle from straight-up
+const POS = {
+  home:   { t1:  0.00, t2: 0.30, label: 'Home',          px: 178, py:  68 },
+  shelf:  { t1: -1.00, t2:-0.30, label: 'Shelf',         px:  58, py:  96 },
+  table:  { t1:  0.78, t2: 1.20, label: 'Patient Table', px: 305, py: 130 },
+  bin:    { t1: -1.10, t2: 1.55, label: 'Bin',           px: 158, py: 184 },
+  center: { t1:  0.05, t2: 0.80, label: 'Center',        px: 183, py: 106 },
+};
+
+// Arm animation target (tweened)
+let arm = { t1: 0, t2: 0.30, gripOpen: true };
+
+/* ═══════════════════════════════════════════════
+   LEVEL DEFINITIONS
+═══════════════════════════════════════════════ */
+const LEVELS = [
+  {
+    n: 1,
+    title: 'Level 1: Hello, Robot!',
+    stars: 1,
+    goal: 'Move the arm to the 📦 Shelf to retrieve the supply.',
+    hint: '💡 Hint: Click move_to → then pick "Shelf" → press Run!',
+    coins: 10,
+    blocks: ['move_to'],
+    locs: ['home','shelf','table'],
+    objs: {},
+    win: (s) => s.robot.pos === 'shelf',
+    winMsg: 'The robot reached the shelf! You gave your first command!',
+    reward: '+10 🪙  |  🔓 Unlocked: grab() and release()!',
+    nextUnlocks: ['grab','release'],
+  },
+  {
+    n: 2,
+    title: 'Level 2: Medicine Delivery 🏥',
+    stars: 2,
+    goal: 'Grab the 💊 medicine from the Shelf and deliver it to the Patient Table.',
+    hint: '💡 Hint: move to shelf → grab → move to table → release',
+    coins: 20,
+    blocks: ['move_to','grab','release'],
+    locs: ['home','shelf','table','bin'],
+    objs: {
+      medicine: { pos: 'shelf', emoji: '💊', label: 'Medicine' }
+    },
+    win: (s) => s.objects.medicine && s.objects.medicine.pos === 'table',
+    winMsg: 'Medicine delivered! The patient says thank you! 🙏',
+    reward: '+20 🪙  |  🔓 Unlocked: repeat loop!',
+    nextUnlocks: ['repeat'],
+  },
+  {
+    n: 3,
+    title: 'Level 3: Stack the Boxes! 📦',
+    stars: 3,
+    goal: 'Move all 3 📦 boxes from the Bin to the Patient Table.\nUse repeat to save yourself from writing the same code 3 times!',
+    hint: '💡 Hint: repeat 3 { move_to bin → grab → move_to table → release }',
+    coins: 30,
+    blocks: ['move_to','grab','release','repeat'],
+    locs: ['home','shelf','table','bin','center'],
+    objs: {
+      box1: { pos: 'bin', emoji: '📦', label: 'Box 1' },
+      box2: { pos: 'bin', emoji: '📦', label: 'Box 2' },
+      box3: { pos: 'bin', emoji: '📦', label: 'Box 3' },
+    },
+    win: (s) =>
+      s.objects.box1?.pos === 'table' &&
+      s.objects.box2?.pos === 'table' &&
+      s.objects.box3?.pos === 'table',
+    winMsg: 'All boxes delivered! You used loops like a real programmer! 🤖',
+    reward: '+30 🪙  |  🔓 Unlocked: Sandbox mode!',
+    nextUnlocks: [],
+  },
+  {
+    n: 4,
+    title: '🎨 Sandbox – Free Play!',
+    stars: 3,
+    goal: 'All blocks are unlocked! Try to deliver the medicine AND move a box. Or invent your own challenge!',
+    hint: '💡 Hint: There\'s no wrong answer here — experiment freely!',
+    coins: 0,
+    blocks: ['move_to','grab','release','repeat'],
+    locs: ['home','shelf','table','bin','center'],
+    objs: {
+      medicine: { pos: 'shelf', emoji: '💊', label: 'Medicine' },
+      box1:     { pos: 'bin',   emoji: '📦', label: 'Box' },
+    },
+    win: () => true,
+    winMsg: 'Amazing work! You\'re a robot programmer! 🚀',
+    reward: 'You\'ve mastered RoboHelper Academy!',
+    nextUnlocks: [],
+  },
+];
+
+/* ═══════════════════════════════════════════════
+   CANVAS DRAWING
+═══════════════════════════════════════════════ */
+const canvas = document.getElementById('robotCanvas');
+const ctx = canvas.getContext('2d');
+
+function tipFrom(t1, t2) {
+  const ex = BX + L1 * Math.sin(t1);
+  const ey = BY - L1 * Math.cos(t1);
+  const tx = ex + L2 * Math.sin(t2);
+  const ty = ey - L2 * Math.cos(t2);
+  return { ex, ey, tx, ty };
+}
+
+function drawScene() {
+  ctx.clearRect(0, 0, CW, CH);
+
+  // Background
+  const bg = ctx.createLinearGradient(0, 0, 0, CH);
+  bg.addColorStop(0, '#eaf1ff');
+  bg.addColorStop(1, '#f5f8ff');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, CW, CH);
+
+  // Dot grid
+  ctx.fillStyle = 'rgba(80,120,200,.1)';
+  for (let x = 25; x < CW; x += 28)
+    for (let y = 25; y < CH; y += 28) {
+      ctx.beginPath(); ctx.arc(x, y, 1.8, 0, Math.PI*2); ctx.fill();
+    }
+
+  // Table surface
+  ctx.fillStyle = '#c8a87a';
+  ctx.fillRect(0, CH-24, CW, 24);
+  ctx.fillStyle = '#b08050';
+  ctx.fillRect(0, CH-26, CW, 4);
+
+  // Shelf (left)
+  drawShelf();
+  // Patient table (right)
+  drawPatientArea();
+  // Bin (center-left lower)
+  drawBin();
+
+  // World objects
+  drawWorldObjects();
+
+  // Robot arm
+  drawArm();
+
+  // Held object
+  if (G.robot.holding) {
+    const { tx, ty } = tipFrom(arm.t1, arm.t2);
+    drawEmoji(G.robot.holding.emoji, tx, ty - 14);
+  }
+}
+
+function drawShelf() {
+  // Wall panel
+  ctx.fillStyle = '#8b6d42';
+  ctx.fillRect(18, 60, 10, 130);
+  // Two planks
+  ctx.fillStyle = '#a07850';
+  ctx.fillRect(18, 90, 78, 9);
+  ctx.fillRect(18, 140, 78, 9);
+  // Bracket details
+  ctx.fillStyle = '#c49a6c';
+  ctx.fillRect(22, 91, 74, 3);
+  ctx.fillRect(22, 141, 74, 3);
+  // Label
+  ctx.fillStyle = '#6b4c28';
+  ctx.font = '9px Nunito, sans-serif';
+  ctx.fontWeight = 'bold';
+  ctx.textAlign = 'center';
+  ctx.fillText('SHELF', 58, 88);
+}
+
+function drawPatientArea() {
+  // Table
+  ctx.fillStyle = '#5b8fa8';
+  ctx.fillRect(264, 148, 72, 9);
+  ctx.fillStyle = '#4a7a90';
+  ctx.fillRect(268, 157, 9, 55);
+  ctx.fillRect(318, 157, 9, 55);
+  // Simple patient icon
+  ctx.fillStyle = '#f4a46a';
+  ctx.beginPath(); ctx.arc(300, 132, 11, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#c07040'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(300, 143); ctx.lineTo(300, 165); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(300, 150); ctx.lineTo(289, 158); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(300, 150); ctx.lineTo(311, 158); ctx.stroke();
+  // Label
+  ctx.fillStyle = '#2c607a';
+  ctx.font = '9px Nunito, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('PATIENT TABLE', 300, 145);
+}
+
+function drawBin() {
+  ctx.fillStyle = '#7ecfe0';
+  ctx.fillRect(128, 186, 58, 38);
+  ctx.strokeStyle = '#50aac0'; ctx.lineWidth = 2;
+  ctx.strokeRect(128, 186, 58, 38);
+  // Bin ridges
+  ctx.strokeStyle = '#50aac0'; ctx.lineWidth = 1;
+  for (let y = 196; y < 220; y += 8) {
+    ctx.beginPath(); ctx.moveTo(130, y); ctx.lineTo(184, y); ctx.stroke();
+  }
+  ctx.fillStyle = '#2a7a8a';
+  ctx.font = '9px Nunito, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('BIN', 157, 205);
+}
+
+function drawWorldObjects() {
+  for (const [, obj] of Object.entries(G.objects)) {
+    if (obj.pos && obj.pos !== 'held') {
+      const p = POS[obj.pos];
+      if (p) drawEmoji(obj.emoji, p.px, p.py);
+    }
+  }
+}
+
+function drawEmoji(em, x, y) {
+  ctx.save();
+  ctx.font = '18px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0,0,0,.2)';
+  ctx.shadowBlur = 4;
+  ctx.fillText(em, x, y);
+  ctx.restore();
+}
+
+function drawArm() {
+  const { ex, ey, tx, ty } = tipFrom(arm.t1, arm.t2);
+
+  // Shadow
+  ctx.save();
+  ctx.globalAlpha = .13;
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 14; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(BX+3, BY+5); ctx.lineTo(ex+3, ey+5); ctx.lineTo(tx+3, ty+5);
+  ctx.stroke();
+  ctx.restore();
+
+  // Upper arm
+  const g1 = ctx.createLinearGradient(BX, BY, ex, ey);
+  g1.addColorStop(0, '#3d7bd6'); g1.addColorStop(1, '#5a9ee8');
+  ctx.strokeStyle = g1; ctx.lineWidth = 14; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(BX, BY); ctx.lineTo(ex, ey); ctx.stroke();
+
+  // Forearm
+  const g2 = ctx.createLinearGradient(ex, ey, tx, ty);
+  g2.addColorStop(0, '#5a9ee8'); g2.addColorStop(1, '#7ab8ff');
+  ctx.strokeStyle = g2; ctx.lineWidth = 10; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(tx, ty); ctx.stroke();
+
+  // Elbow joint
+  ctx.fillStyle = '#2355a0';
+  ctx.beginPath(); ctx.arc(ex, ey, 8, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#7ab8ff';
+  ctx.beginPath(); ctx.arc(ex, ey, 4, 0, Math.PI*2); ctx.fill();
+
+  // Base joint
+  ctx.fillStyle = '#1a3a70';
+  ctx.beginPath(); ctx.arc(BX, BY, 12, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#3d7bd6';
+  ctx.beginPath(); ctx.arc(BX, BY, 7, 0, Math.PI*2); ctx.fill();
+
+  // Base platform
+  ctx.fillStyle = '#2355a0';
+  ctx.fillRect(BX-22, BY, 44, 14);
+  ctx.fillStyle = '#1a3a70';
+  ctx.fillRect(BX-28, BY+12, 56, 8);
+
+  // Gripper
+  drawGripper(tx, ty, arm.t2);
+}
+
+function drawGripper(tx, ty, angle) {
+  const spread = arm.gripOpen ? 10 : 3;
+  ctx.save();
+  ctx.translate(tx, ty);
+  ctx.rotate(angle);
+  ctx.strokeStyle = '#2355a0'; ctx.lineWidth = 5; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-spread, 18); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo( spread, 18); ctx.stroke();
+  ctx.fillStyle = '#5a9ee8';
+  ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+/* ═══════════════════════════════════════════════
+   ANIMATION
+═══════════════════════════════════════════════ */
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function animArmTo(posName) {
+  const target = POS[posName];
+  if (!target) return;
+  const st1 = arm.t1, st2 = arm.t2;
+  const et1 = target.t1, et2 = target.t2;
+  const dur = 800, t0 = performance.now();
+  return new Promise(res => {
+    function frame(now) {
+      const p = Math.min((now - t0) / dur, 1);
+      const e = 1 - Math.pow(1 - p, 3);
+      arm.t1 = st1 + (et1 - st1) * e;
+      arm.t2 = st2 + (et2 - st2) * e;
+      drawScene();
+      p < 1 ? requestAnimationFrame(frame) : res();
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+async function animGripper(open) {
+  arm.gripOpen = open;
+  drawScene();
+  await sleep(350);
+}
+
+/* ═══════════════════════════════════════════════
+   BLOCK DEFINITIONS
+═══════════════════════════════════════════════ */
+const BLOCK_DEFS = {
+  move_to: { cls: 'move',    icon: '→',  label: 'move_to',  desc: 'Move arm to a location' },
+  grab:    { cls: 'gripper', icon: '🤏', label: 'grab()',   desc: 'Close gripper (pick up object)' },
+  release: { cls: 'gripper', icon: '✋', label: 'release()', desc: 'Open gripper (put down object)' },
+  repeat:  { cls: 'control', icon: '🔄', label: 'repeat',   desc: 'Repeat a sequence of steps' },
+};
+
+/* ═══════════════════════════════════════════════
+   PALETTE RENDERING
+═══════════════════════════════════════════════ */
+function renderPalette() {
+  const lvl = LEVELS[G.level];
+  const pal = document.getElementById('palette');
+  pal.innerHTML = '';
+
+  Object.entries(BLOCK_DEFS).forEach(([key, def]) => {
+    const unlocked = lvl.blocks.includes(key);
+    const btn = document.createElement('button');
+    btn.className = `pal-block ${def.cls} ${unlocked ? '' : 'locked'}`;
+    btn.title = def.desc;
+    btn.innerHTML = `<span>${def.icon}</span><span>${def.label}</span>${!unlocked ? '<span class="lock-tag">🔒</span>' : ''}`;
+    if (unlocked) btn.onclick = () => addBlock(key);
+    pal.appendChild(btn);
+
+    if (key === 'repeat' && unlocked) {
+      const end = document.createElement('button');
+      end.className = 'pal-block control';
+      end.style.marginLeft = '14px';
+      end.innerHTML = '<span>⤵</span><span>end repeat</span>';
+      end.onclick = () => addBlock('repeat_end');
+      pal.appendChild(end);
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   WORKSPACE RENDERING
+═══════════════════════════════════════════════ */
+function addBlock(key) {
+  const lvl = LEVELS[G.level];
+  let b;
+  if (key === 'move_to')     b = { type: 'move_to',      loc: lvl.locs[1] || 'shelf', id: Date.now() };
+  else if (key === 'grab')   b = { type: 'grab',          id: Date.now() };
+  else if (key === 'release')b = { type: 'release',       id: Date.now() };
+  else if (key === 'repeat') b = { type: 'repeat_start',  count: 3, id: Date.now() };
+  else if (key === 'repeat_end') b = { type: 'repeat_end', id: Date.now() };
+  if (b) { G.program.push(b); renderWorkspace(); }
+}
+
+function removeBlock(i) { G.program.splice(i, 1); renderWorkspace(); }
+
+function renderWorkspace() {
+  const lvl = LEVELS[G.level];
+  const ws = document.getElementById('workspace');
+  ws.innerHTML = '';
+
+  if (!G.program.length) {
+    ws.innerHTML = `<div class="empty-ws"><div class="big">👈</div><div>Click a block on the left to add it here, then hit Run!</div></div>`;
+    return;
+  }
+
+  let indent = 0;
+  G.program.forEach((b, i) => {
+    if (b.type === 'repeat_end') indent = Math.max(0, indent - 1);
+
+    const div = document.createElement('div');
+    const cls = b.type.startsWith('move') ? 'move' : b.type === 'grab' || b.type === 'release' ? 'gripper' : 'control';
+    div.className = `prog-block ${cls}${indent > 0 ? ' indent' : ''}`;
+    div.dataset.i = i;
+
+    let inner = `<span class="step-num">${i+1}</span>`;
+
+    if (b.type === 'move_to') {
+      const opts = lvl.locs.map(l => `<option value="${l}" ${b.loc===l?'selected':''}>${POS[l]?.label||l}</option>`).join('');
+      inner += `→ move_to <select onchange="G.program[${i}].loc=this.value">${opts}</select>`;
+    } else if (b.type === 'grab')   inner += '🤏 grab()';
+    else if (b.type === 'release')  inner += '✋ release()';
+    else if (b.type === 'repeat_start') {
+      inner += `🔄 repeat <input type="number" min="1" max="10" value="${b.count}"
+        onchange="G.program[${i}].count=Math.max(1,parseInt(this.value)||1)"
+        onclick="event.stopPropagation()"> times  {`;
+    } else if (b.type === 'repeat_end') inner += '} end repeat';
+
+    inner += `<button class="rm-btn" onclick="removeBlock(${i})">✕</button>`;
+    div.innerHTML = inner;
+    ws.appendChild(div);
+
+    if (b.type === 'repeat_start') indent++;
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   EXECUTION ENGINE
+═══════════════════════════════════════════════ */
+function expandProgram(prog) {
+  const out = [];
+  let i = 0;
+  while (i < prog.length) {
+    const b = prog[i];
+    if (b.type === 'repeat_start') {
+      let j = i+1, depth = 1;
+      while (j < prog.length && depth > 0) {
+        if (prog[j].type === 'repeat_start') depth++;
+        if (prog[j].type === 'repeat_end')   depth--;
+        j++;
+      }
+      const body = prog.slice(i+1, j-1);
+      const n = Math.max(1, b.count || 1);
+      for (let r = 0; r < n; r++) expandProgram(body).forEach(x => out.push({...x, srcIdx: i}));
+      i = j;
+    } else if (b.type === 'repeat_end') {
+      i++;
+    } else {
+      out.push({...b, srcIdx: i});
+      i++;
+    }
+  }
+  return out;
+}
+
+function hlBlock(srcIdx) {
+  document.querySelectorAll('.prog-block').forEach(el => {
+    el.classList.toggle('active', parseInt(el.dataset.i) === srcIdx);
+  });
+}
+
+async function runProgram() {
+  if (G.running) return;
+  if (!G.program.length) { showFeedback('Add some blocks first!', false); return; }
+
+  G.running = true;
+  document.body.classList.add('running');
+  document.getElementById('runBtn').disabled = true;
+  document.getElementById('feedback').className = 'feedback';
+
+  const steps = expandProgram(G.program);
+
+  for (const step of steps) {
+    hlBlock(step.srcIdx);
+    await execStep(step);
+    await sleep(150);
+  }
+
+  document.querySelectorAll('.prog-block.active').forEach(el => el.classList.remove('active'));
+  drawScene();
+
+  const lvl = LEVELS[G.level];
+  if (lvl.win(G)) showWin();
+  else             showFail();
+
+  G.running = false;
+  document.body.classList.remove('running');
+  document.getElementById('runBtn').disabled = false;
+}
+
+async function execStep(step) {
+  if (step.type === 'move_to') {
+    await animArmTo(step.loc);
+    G.robot.pos = step.loc;
+
+  } else if (step.type === 'grab') {
+    // Find first object at current position
+    let found = null;
+    for (const [k, o] of Object.entries(G.objects)) {
+      if (o.pos === G.robot.pos && !G.robot.holding) { found = k; break; }
+    }
+    if (found) {
+      G.robot.holding = G.objects[found];
+      G.objects[found].pos = 'held';
+    }
+    await animGripper(false);
+
+  } else if (step.type === 'release') {
+    if (G.robot.holding) {
+      for (const [, o] of Object.entries(G.objects)) {
+        if (o === G.robot.holding) { o.pos = G.robot.pos; break; }
+      }
+      G.robot.holding = null;
+    }
+    await animGripper(true);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   LEVEL MANAGEMENT
+═══════════════════════════════════════════════ */
+function loadLevel() {
+  const lvl = LEVELS[G.level];
+
+  G.robot = { pos: 'home', holding: null };
+  arm = { t1: POS.home.t1, t2: POS.home.t2, gripOpen: true };
+
+  G.objects = {};
+  for (const [k, v] of Object.entries(lvl.objs || {}))
+    G.objects[k] = { ...v };
+
+  G.program = [];
+
+  // Header
+  document.getElementById('levelTitle').textContent = lvl.title;
+  const stars = '⭐'.repeat(lvl.stars) + '☆'.repeat(4 - lvl.stars);
+  document.getElementById('starRow').textContent = stars;
+  document.getElementById('goalText').textContent = lvl.goal;
+  document.getElementById('hintRow').textContent = lvl.hint;
+
+  renderPalette();
+  renderWorkspace();
+  drawScene();
+
+  document.getElementById('feedback').className = 'feedback';
+}
+
+function resetLevel() {
+  if (G.running) return;
+  loadLevel();
+}
+
+function clearProgram() {
+  if (G.running) return;
+  G.program = [];
+  renderWorkspace();
+}
+
+function showWin() {
+  const lvl = LEVELS[G.level];
+  G.coins += lvl.coins;
+  document.getElementById('coinCount').textContent = G.coins;
+
+  document.getElementById('winTitle').textContent = lvl.n === 4 ? '🏆 You did it!' : '🎉 Level Complete!';
+  document.getElementById('winBody').textContent   = lvl.winMsg;
+  document.getElementById('winReward').textContent = lvl.reward;
+
+  const nxt = document.getElementById('nextBtn');
+  if (G.level >= LEVELS.length - 1) {
+    nxt.textContent = '🚀 Play Again!';
+    nxt.onclick = () => { G.level = 0; G.coins = 0; document.getElementById('coinCount').textContent = 0; closeOverlay('winOverlay'); loadLevel(); };
+  } else {
+    nxt.textContent = 'Next Level →';
+    nxt.onclick = nextLevel;
+  }
+  document.getElementById('winOverlay').classList.add('show');
+}
+
+function showFail() {
+  const lvl = LEVELS[G.level];
+  document.getElementById('failBody').textContent = lvl.hint.replace('💡 Hint: ', 'Not quite! ');
+  document.getElementById('failOverlay').classList.add('show');
+}
+
+function nextLevel() {
+  closeOverlay('winOverlay');
+  G.level = Math.min(G.level + 1, LEVELS.length - 1);
+  loadLevel();
+}
+
+function closeOverlay(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+loadLevel();
+
+// Passive redraw loop (keeps canvas fresh if needed)
+function loop() { if (!G.running) drawScene(); requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
