@@ -13,6 +13,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'robotics_secret_change_in_prod';
 const CODE_TTL_MS = 10 * 60 * 1000;
 const RESEND_WAIT_MS = 30 * 1000;
 
+//console.log("DATABASE_URL =", process.env.DATABASE_URL); DONT PRINT THIS OR OUR CLOUD KEY GETS LEAKED IN TERMINAL
+
 // ─── Validation ───────────────────────────────────────────────────────────────
 const VALID_GRADE_LEVELS = [
   '1st Grade','2nd Grade','3rd Grade','4th Grade','5th Grade',
