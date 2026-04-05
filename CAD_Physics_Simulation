@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAD to Simulation - Single HTML</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: sans-serif; background: #1a1a2e; }
+        #ui { position: absolute; top: 15px; left: 15px; background: rgba(20, 20, 30, 0.9); padding: 15px; border-radius: 8px; color: white; border: 1px solid #444; }
+        button { padding: 8px 16px; margin-right: 10px; cursor: pointer; background: #4f46e5; color: white; border: none; border-radius: 4px; font-weight: bold; }
+        button:hover { background: #4338ca; }
+        #simBtn { background: #10b981; }
+        #simBtn.active { background: #ef4444; }
+    </style>
+
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+                "cannon-es": "https://unpkg.com/cannon-es@0.20.0/dist/cannon-es.js"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="ui">
+        <button id="addBtn">+ Add Block</button>
+        <button id="simBtn">Run Simulation</button>
+        <span id="modeText">Mode: <strong>CAD Setup</strong></span>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { TransformControls } from 'three/addons/controls/TransformControls.js';
+        import * as CANNON from 'cannon-es';
+
+        // --- 1. SETUP GRAPHICS (Three.js) ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color('#87CEEB'); // Sky blue
+        
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(5, 5, 5);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        dirLight.position.set(10, 20, 10);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        // Controls
+        const orbitControls = new OrbitControls(camera, renderer.domElement);
+        const transformControl = new TransformControls(camera, renderer.domElement);
+        scene.add(transformControl);
+        
+        // Disable orbit controls while dragging blocks
+        transformControl.addEventListener('dragging-changed', (event) => {
+            orbitControls.enabled = !event.value;
+        });
+
+        // Floor (Graphics)
+        const floorGeo = new THREE.PlaneGeometry(20, 20);
+        const floorMat = new THREE.MeshStandardMaterial({ color: '#cccccc' });
+        const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+        floorMesh.rotation.x = -Math.PI / 2;
+        floorMesh.receiveShadow = true;
+        scene.add(floorMesh);
+
+        const gridHelper = new THREE.GridHelper(20, 20);
+        scene.add(gridHelper);
+
+        // --- 2. SETUP PHYSICS (Cannon-es) ---
+        const world = new CANNON.World({
+            gravity: new CANNON.Vec3(0, -9.82, 0), // Gravity pointing down
+        });
+
+        // Floor (Physics)
+        const floorBody = new CANNON.Body({
+            type: CANNON.Body.STATIC,
+            shape: new CANNON.Plane(),
+        });
+        floorBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // Match graphics rotation
+        world.addBody(floorBody);
+
+        // --- 3. APP LOGIC & STATE ---
+        let isSimulating = false;
+        const blocks = []; // Holds objects linking Three meshes and Cannon bodies
+
+        const addBtn = document.getElementById('addBtn');
+        const simBtn = document.getElementById('simBtn');
+        const modeText = document.getElementById('modeText');
+
+        // Function to create a new block
+        function spawnBlock() {
+            // Graphics Mesh
+            const geo = new THREE.BoxGeometry(1, 1, 1);
+            const mat = new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(0, 3 + blocks.length, 0);
+            mesh.castShadow = true;
+            scene.add(mesh);
+
+            // Physics Body
+            const shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5)); // Cannon uses half-extents
+            const body = new CANNON.Body({ mass: 1, shape: shape });
+            // Don't add to physics world yet (we are in CAD mode)
+
+            blocks.push({ mesh, body, initialPos: new THREE.Vector3(), initialQuat: new THREE.Quaternion() });
+            
+            // Auto-attach transform controls to the new block
+            if (!isSimulating) transformControl.attach(mesh);
+        }
+
+        // Selection Logic (Click to drag)
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        window.addEventListener('mousedown', (event) => {
+            if (isSimulating) return; // Can't select during simulation
+            if (event.target.tagName === 'BUTTON') return; // Ignore UI clicks
+
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObjects(blocks.map(b => b.mesh));
+            if (intersects.length > 0) {
+                transformControl.attach(intersects[0].object);
+            } else {
+                transformControl.detach();
+            }
+        });
+
+        // Toggle Simulation
+        simBtn.addEventListener('click', () => {
+            isSimulating = !isSimulating;
+            
+            if (isSimulating) {
+                // START SIMULATION
+                simBtn.textContent = "Reset to CAD Mode";
+                simBtn.classList.add('active');
+                modeText.innerHTML = "Mode: <strong>Physics Simulation</strong>";
+                addBtn.disabled = true;
+                addBtn.style.opacity = '0.5';
+                transformControl.detach(); // Hide CAD arrows
+
+                // Sync physics bodies to current CAD positions and add to world
+                blocks.forEach(block => {
+                    // Save CAD positions so we can reset later
+                    block.initialPos.copy(block.mesh.position);
+                    block.initialQuat.copy(block.mesh.quaternion);
+
+                    // Move physics body to mesh position
+                    block.body.position.copy(block.mesh.position);
+                    block.body.quaternion.copy(block.mesh.quaternion);
+                    block.body.velocity.set(0,0,0);
+                    block.body.angularVelocity.set(0,0,0);
+                    world.addBody(block.body);
+                });
+
+            } else {
+                // RESET TO CAD MODE
+                simBtn.textContent = "Run Simulation";
+                simBtn.classList.remove('active');
+                modeText.innerHTML = "Mode: <strong>CAD Setup</strong>";
+                addBtn.disabled = false;
+                addBtn.style.opacity = '1';
+
+                // Remove from physics world and reset meshes to initial positions
+                blocks.forEach(block => {
+                    world.removeBody(block.body);
+                    block.mesh.position.copy(block.initialPos);
+                    block.mesh.quaternion.copy(block.initialQuat);
+                });
+            }
+        });
+
+        // Spawn one block to start
+        spawnBlock();
+        addBtn.addEventListener('click', spawnBlock);
+
+        // --- 4. RENDER LOOP ---
+        const timeStep = 1 / 60;
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (isSimulating) {
+                // Step physics world
+                world.step(timeStep);
+                
+                // Copy coordinates from Physics to Graphics
+                blocks.forEach(block => {
+                    block.mesh.position.copy(block.body.position);
+                    block.mesh.quaternion.copy(block.body.quaternion);
+                });
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle Window Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
