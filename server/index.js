@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const { generateCode, sendVerificationEmail, sendPasswordResetEmail } = require('./email');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 require('dotenv').config();
 
 const prisma = new PrismaClient();
@@ -51,6 +52,25 @@ function validateSignup({ firstName, lastName, age, gradeLevel, town, state, ema
   if (password.length > 30)                    return 'Password must be 30 characters or fewer.';
   return null;
 }
+
+// ─── Kinder-Blockly Proxy (must be before body parsers) ──────────────────────
+const kinderBlocklyPageProxy = createProxyMiddleware({
+  target: 'http://127.0.0.1:5000',
+  changeOrigin: true,
+  pathRewrite: { '^/blockly': '/' },
+});
+const kinderBlocklyApiProxy = createProxyMiddleware({
+  target: 'http://127.0.0.1:5000',
+  changeOrigin: true,
+  proxyTimeout: 60000,
+  timeout: 60000,
+});
+app.use((req, res, next) => {
+  const p = req.path;
+  if (p === '/blockly' || p.startsWith('/blockly/')) return kinderBlocklyPageProxy(req, res, next);
+  if (p === '/reset' || p === '/run' || p.startsWith('/static')) return kinderBlocklyApiProxy(req, res, next);
+  next();
+});
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
@@ -350,6 +370,7 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error.' });
   }
 });
+
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {

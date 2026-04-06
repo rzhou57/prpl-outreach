@@ -4,8 +4,12 @@
   "private": true,
   "scripts": {
     "install:all": "cd server && npm install && cd ../client && npm install",
+    "dev": "concurrently -n client,server,blockly -c cyan,green,yellow \"cd client && npm run dev\" \"cd server && npm run dev\" \"cd $(grep KINDER_BLOCKLY_PATH server/.env | cut -d= -f2) && python -m kinder_blockly\"",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
     "start:server": "cd server && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }

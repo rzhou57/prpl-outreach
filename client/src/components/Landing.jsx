@@ -1,8 +1,18 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 import styles from './Landing.module.css';
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { token } = useAuth();
+
+  const goToKinderBlockly = () => {
+    if (token) {
+      navigate('/kinder-blockly');
+    } else {
+      navigate('/auth?tab=signup');
+    }
+  };
 
   return (
     <div className={styles.page}>
@@ -26,6 +36,7 @@ export default function Landing() {
           </div>
         </div>
         <div className={styles.navActions}>
+          <button className={styles.navBlockly} onClick={goToKinderBlockly}>Go to Kinder-Blockly</button>
           <button className={styles.navSignup} onClick={() => navigate('/auth?tab=signup')}>Sign Up</button>
           <button className={styles.navLogin} onClick={() => navigate('/auth?tab=login')}>Log In</button>
         </div>
@@ -44,6 +55,7 @@ export default function Landing() {
             just like we do.
           </p>
           <div className={styles.actions}>
+            <button className={styles.btnBlockly} onClick={goToKinderBlockly}>Go to Kinder-Blockly</button>
             <button className={styles.btnPrimary} onClick={() => navigate('/auth?tab=signup')}>Sign Up</button>
             <button className={styles.btnGhost} onClick={() => navigate('/auth?tab=login')}>Log In</button>
           </div>

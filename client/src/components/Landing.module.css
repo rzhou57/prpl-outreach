@@ -115,6 +115,26 @@
 
 .navLogin:hover { color: #1a1a1a; }
 
+.navBlockly {
+  background: none;
+  border: 1.5px solid #a855f7;
+  color: #7c3aed;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 18px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+
+.navBlockly:hover {
+  background: #7c3aed;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.28);
+}
+
 .navSignup {
   background: #7c3aed;
   border: none;
@@ -215,6 +235,27 @@
 .btnPrimary:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 28px rgba(124, 58, 237, 0.38);
+}
+
+.btnBlockly {
+  background: none;
+  border: 1.5px solid #a855f7;
+  color: #7c3aed;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 13px 28px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+
+.btnBlockly:hover {
+  background: #7c3aed;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(124, 58, 237, 0.3);
 }
 
 .btnGhost {

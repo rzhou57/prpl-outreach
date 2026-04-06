@@ -9,6 +9,22 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,
+      },
+      '/blockly': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+      '/reset': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+      '/run': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+      '/static': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
       }
     }
   }
