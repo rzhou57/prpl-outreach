@@ -89,7 +89,7 @@
 .logoSub {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #9333ea;
+  color: #a56cf0;
   letter-spacing: 0.04em;
   line-height: 1;
 }
@@ -117,8 +117,8 @@
 
 .navBlockly {
   background: none;
-  border: 1.5px solid #a855f7;
-  color: #7c3aed;
+  border: 1.5px solid #b883fa;
+  color: #9160ee;
   font-family: var(--font-body);
   font-size: 0.88rem;
   font-weight: 700;
@@ -130,13 +130,13 @@
 }
 
 .navBlockly:hover {
-  background: #7c3aed;
+  background: #9160ee;
   color: #fff;
   box-shadow: 0 4px 14px rgba(124, 58, 237, 0.28);
 }
 
 .navSignup {
-  background: #7c3aed;
+  background: #9160ee;
   border: none;
   color: #fff;
   font-family: var(--font-body);
@@ -150,7 +150,7 @@
 }
 
 .navSignup:hover {
-  background: #6d28d9;
+  background: #8350e2;
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3);
 }
@@ -181,7 +181,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #9333ea;
+  color: #a56cf0;
   margin-bottom: 22px;
 }
 
@@ -197,7 +197,7 @@
 
 .title em {
   font-style: italic;
-  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  background: linear-gradient(135deg, #b883fa, #9160ee);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -218,7 +218,7 @@
 }
 
 .btnPrimary {
-  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  background: linear-gradient(135deg, #b883fa, #9160ee);
   border: none;
   color: #fff;
   font-family: var(--font-body);
@@ -239,8 +239,8 @@
 
 .btnBlockly {
   background: none;
-  border: 1.5px solid #a855f7;
-  color: #7c3aed;
+  border: 1.5px solid #b883fa;
+  color: #9160ee;
   font-family: var(--font-body);
   font-size: 0.9rem;
   font-weight: 700;
@@ -252,7 +252,7 @@
 }
 
 .btnBlockly:hover {
-  background: #7c3aed;
+  background: #9160ee;
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 10px 28px rgba(124, 58, 237, 0.3);
@@ -272,8 +272,8 @@
 }
 
 .btnGhost:hover {
-  border-color: #a855f7;
-  color: #7c3aed;
+  border-color: #b883fa;
+  color: #9160ee;
 }
 
 /* Visual */
@@ -326,7 +326,7 @@
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.15em;
-  color: #a855f7;
+  color: #b883fa;
   margin-bottom: 14px;
 }
 
@@ -343,6 +343,68 @@
   font-size: 0.87rem;
   color: #666;
   line-height: 1.72;
+}
+
+/* Abstraction section */
+.abstraction {
+  padding: 72px 56px;
+  border-top: 1px solid rgba(0,0,0,0.07);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  animation: fadeSlideUp 0.7s ease 0.15s both;
+}
+
+.abstractionContent {
+  text-align: center;
+  max-width: 620px;
+  margin: 0 auto 48px;
+}
+
+.abstractionTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 900;
+  color: #1a1a1a;
+  letter-spacing: -0.03em;
+  margin-bottom: 18px;
+}
+
+.abstractionTitle em {
+  font-style: italic;
+  background: linear-gradient(135deg, #b883fa, #9160ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.abstractionBody {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.78;
+}
+
+.abstractionBody strong {
+  color: #9160ee;
+  font-weight: 700;
+}
+
+.abstractionVis {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 32px rgba(124, 58, 237, 0.1), 0 1px 8px rgba(0,0,0,0.08);
+  border: 1px solid rgba(168, 85, 247, 0.15);
+}
+
+.abstractionSvg {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 /* CTA */
@@ -401,6 +463,7 @@
   .pillars { flex-direction: column; padding: 56px 28px; gap: 36px; }
   .pillar { padding: 0; }
   .pillarDivider { width: 100%; height: 1px; margin: 0; background: linear-gradient(to right, transparent, rgba(168,85,247,0.2), transparent); }
+  .abstraction { padding: 56px 28px; }
   .cta { flex-direction: column; gap: 24px; text-align: center; padding: 56px 28px; }
   .nav { padding: 16px 24px; }
   .footer { padding: 20px 28px; flex-wrap: wrap; }
