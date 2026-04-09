@@ -2,10 +2,16 @@
   "name": "roboleague",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "install:all": "cd server && npm install && cd ../client && npm install",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
-    "start:server": "cd server && npm start"
+    "start": "cd server && npm start",
+    "build": "cd client && npm run build",
+    "start:prod": "npm run build && cd server && npm start",
+    "heroku-postbuild": "cd server && npm install && cd ../client && npm install && npm run build"
   }
 }

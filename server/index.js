@@ -2,9 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 const { PrismaClient } = require('@prisma/client');
 const { generateCode, sendVerificationEmail, sendPasswordResetEmail } = require('./email');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const prisma = new PrismaClient();
 const app = express();
@@ -55,6 +56,7 @@ function validateSignup({ firstName, lastName, age, gradeLevel, town, state, ema
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
 const authenticateToken = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
@@ -349,6 +351,11 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
     console.error('Me error:', err);
     res.status(500).json({ error: 'Internal server error.' });
   }
+});
+
+// ─── SPA fallback ────────────────────────────────────────────────────────────
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
 // ─── Start ────────────────────────────────────────────────────────────────────
