@@ -2,9 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const path = require('path');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const { PrismaClient } = require('@prisma/client');
 const { generateCode, sendVerificationEmail, sendPasswordResetEmail } = require('./email');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const prisma = new PrismaClient();
 const app = express();
@@ -12,6 +14,8 @@ const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'robotics_secret_change_in_prod';
 const CODE_TTL_MS = 10 * 60 * 1000;
 const RESEND_WAIT_MS = 30 * 1000;
+
+//console.log("DATABASE_URL =", process.env.DATABASE_URL); DONT PRINT THIS OR OUR CLOUD KEY GETS LEAKED IN TERMINAL
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 const VALID_GRADE_LEVELS = [
@@ -50,9 +54,29 @@ function validateSignup({ firstName, lastName, age, gradeLevel, town, state, ema
   return null;
 }
 
+// ─── Kinder-Blockly Proxy (must be before body parsers) ──────────────────────
+const kinderBlocklyPageProxy = createProxyMiddleware({
+  target: 'http://127.0.0.1:5000',
+  changeOrigin: true,
+  pathRewrite: { '^/blockly': '/' },
+});
+const kinderBlocklyApiProxy = createProxyMiddleware({
+  target: 'http://127.0.0.1:5000',
+  changeOrigin: true,
+  proxyTimeout: 60000,
+  timeout: 60000,
+});
+app.use((req, res, next) => {
+  const p = req.path;
+  if (p === '/blockly' || p.startsWith('/blockly/')) return kinderBlocklyPageProxy(req, res, next);
+  if (p === '/reset' || p === '/run' || p.startsWith('/static')) return kinderBlocklyApiProxy(req, res, next);
+  next();
+});
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
 const authenticateToken = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
@@ -347,6 +371,11 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
     console.error('Me error:', err);
     res.status(500).json({ error: 'Internal server error.' });
   }
+});
+
+// ─── SPA fallback ────────────────────────────────────────────────────────────
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
 // ─── Start ────────────────────────────────────────────────────────────────────
