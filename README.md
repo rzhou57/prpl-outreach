@@ -36,13 +36,15 @@ SMTP_PORT=
 SMTP_USER=
 SMTP_PASS=
 
-CLIENT_URL=http://localhost:5173
+
+KINDER_BLOCKLY_PATH=../kinder-baselines/kinder-blockly
 ```
 
 **Getting each value:**
 - `DATABASE_URL` — ask Tomasz for url privately
 - `JWT_SECRET` — make up any long random string, e.g. `prpl_secret_xk29smq482`
 - `SMTP_USER` / `SMTP_PASS` — You guys don't have to worry about this. I'll be maintaining this. For testing purposes, I have a verified test account setup in the cloud to use for logins (ask me for this)
+- `KINDER_BLOCKLY_PATH` — relative path from the repo root to the `kinder-blockly` package. Default assumes `kinder-baselines` is a sibling directory of `prpl-outreach`. Adjust if your local layout differs.
 
 ---
 
@@ -59,25 +61,49 @@ Then generate the Prisma client:
 ./node_modules/.bin/prisma generate
 ```
 ---
-### 4. Run the app
 
-You need **two terminals open at the same time.**
+### 4. Set up kinder-blockly
 
-**Terminal 1 — Backend:**
+`kinder-blockly` is a separate Python package that lives in the `kinder-baselines` repo. It must be installed before running the app.
+
 ```bash
-cd server
-node index.js
-# Server runs at http://localhost:3001
+cd <path-to-kinder-baselines>/kinder-blockly
+pip install -e .
 ```
 
-**Terminal 2 — Frontend:**
+By default the app expects `kinder-baselines` to be a sibling directory of `prpl-outreach`:
+```
+ECE531/
+  prpl-outreach/   ← this repo
+  kinder-baselines/
+    kinder-blockly/
+```
+
+If your layout differs, update `KINDER_BLOCKLY_PATH` in `server/.env`.
+
+---
+
+### 5. Run the app
+
+From the **repo root**, run everything with one command:
+
 ```bash
-cd client
 npm run dev
-# Runs at http://localhost:5173
 ```
+
+This builds the frontend, then starts the Express server and kinder-blockly proxy concurrently.
 
 Open **http://localhost:5173** in your browser.
+
+> **Alternatively**, if you want separate terminals:
+>
+> ```bash
+> # Terminal 1 — Backend
+> cd server && node index.js
+>
+> # Terminal 2 — Frontend
+> cd client && npm run dev
+> ```
 
 ---
 
@@ -149,7 +175,7 @@ model Student {
 
 ---
 
-## Current Features (as of 4/1/2026)
+## Current Features (as of 4/6/2026)
 
 - Landing page with animated robot in kitchen scene
 - Sign up / Log in with tabbed auth page
@@ -160,3 +186,4 @@ model Student {
 - Input validation on both frontend and backend
 - Passwords hashed with bcrypt (never stored plain)
 - JWT session tokens (7 day expiry)
+- Kinder-Blockly visual programming interface (auth-gated, proxied through Express)
