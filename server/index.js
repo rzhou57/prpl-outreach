@@ -69,7 +69,7 @@ const kinderBlocklyApiProxy = createProxyMiddleware({
 app.use((req, res, next) => {
   const p = req.path;
   if (p === '/blockly' || p.startsWith('/blockly/')) return kinderBlocklyPageProxy(req, res, next);
-  if (p === '/reset' || p === '/run' || p.startsWith('/static')) return kinderBlocklyApiProxy(req, res, next);
+  if (p === '/reset' || p === '/run' || p === '/score' || p.startsWith('/static') || p.startsWith('/challenges')) return kinderBlocklyApiProxy(req, res, next);
   next();
 });
 

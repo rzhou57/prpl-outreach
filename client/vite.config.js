@@ -25,6 +25,14 @@ export default defineConfig({
       '/static': {
         target: 'http://localhost:3001',
         changeOrigin: true,
+      },
+      '/challenges': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+      '/score': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
       }
     }
   }
