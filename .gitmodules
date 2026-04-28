@@ -1,0 +1,3 @@
+[submodule "kinder-baselines"]
+	path = kinder-baselines
+	url = https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines.git

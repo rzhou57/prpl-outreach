@@ -1,8 +1,7 @@
 # Dependencies
 node_modules/
 client/node_modules/
-server/node_modules/
-kinder-baselines/
+server/node_modules//
 # Environment variables (never commit these)
 .env
 .env.local
