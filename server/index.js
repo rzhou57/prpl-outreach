@@ -56,12 +56,12 @@ function validateSignup({ firstName, lastName, age, gradeLevel, town, state, ema
 
 // ─── Kinder-Blockly Proxy (must be before body parsers) ──────────────────────
 const kinderBlocklyPageProxy = createProxyMiddleware({
-  target: 'http://127.0.0.1:5000',
+  target: 'http://34.123.247.112:5000',
   changeOrigin: true,
   pathRewrite: { '^/blockly': '/' },
 });
 const kinderBlocklyApiProxy = createProxyMiddleware({
-  target: 'http://127.0.0.1:5000',
+  target: 'http://34.123.247.112:5000',
   changeOrigin: true,
   proxyTimeout: 60000,
   timeout: 60000,
