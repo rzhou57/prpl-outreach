@@ -1,1 +1,0 @@
-git+https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines.git#subdirectory=kinder-blockly
