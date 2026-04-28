@@ -1,1 +1,1 @@
-web: git submodule update --init --recursive && bash bin/start.sh
+web: bash bin/start.sh
