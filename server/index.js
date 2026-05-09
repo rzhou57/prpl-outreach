@@ -26,6 +26,20 @@ app.use((req, res, next) => {
   next();
 });
 
+// ─── HTTPS Redirect ───────────────────────────────────────────────────────────
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'production' && !req.secure && req.get('x-forwarded-proto') !== 'https') {
+    return res.redirect('https://' + req.get('host') + req.url);
+  }
+  next();
+});
+
+// ─── HSTS Header ──────────────────────────────────────────────────────────────
+app.use((req, res, next) => {
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  next();
+});
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
 app.use(express.json());
