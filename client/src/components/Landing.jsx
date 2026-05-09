@@ -1,10 +1,6 @@
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
 import styles from './Landing.module.css';
 
 export default function Landing() {
-  const navigate = useNavigate();
-  const { token } = useAuth();
   const kinderFunctionLines = [
     'def _run_move_base_to(',
     '    env: Any,',
@@ -48,11 +44,7 @@ export default function Landing() {
   ];
 
   const goToKinderBlockly = () => {
-    if (token) {
-      navigate('/kinder-blockly');
-    } else {
-      navigate('/auth?tab=signup');
-    }
+    window.location.href = '/blockly';
   };
 
   return (
@@ -78,8 +70,6 @@ export default function Landing() {
         </div>
         <div className={styles.navActions}>
           <button className={styles.navBlockly} onClick={goToKinderBlockly}>Go to Kinder-Blockly</button>
-          <button className={styles.navSignup} onClick={() => navigate('/auth?tab=signup')}>Sign Up</button>
-          <button className={styles.navLogin} onClick={() => navigate('/auth?tab=login')}>Log In</button>
         </div>
       </nav>
 
@@ -97,8 +87,6 @@ export default function Landing() {
           </p>
           <div className={styles.actions}>
             <button className={styles.btnBlockly} onClick={goToKinderBlockly}>Go to Kinder-Blockly</button>
-            <button className={styles.btnPrimary} onClick={() => navigate('/auth?tab=signup')}>Sign Up</button>
-            <button className={styles.btnGhost} onClick={() => navigate('/auth?tab=login')}>Log In</button>
           </div>
         </div>
 
@@ -561,7 +549,7 @@ export default function Landing() {
 
       <section className={styles.cta}>
         <p className={styles.ctaText}>Ready to build something that thinks?</p>
-        <button className={styles.btnPrimary} onClick={() => navigate('/auth?tab=signup')}>Create your account</button>
+        <button className={styles.btnPrimary} onClick={goToKinderBlockly}>Launch Kinder-Blockly</button>
       </section>
 
       <footer className={styles.footer}>

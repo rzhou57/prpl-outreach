@@ -7,7 +7,7 @@
   },
   "scripts": {
     "install:all": "cd server && npm install && cd ../client && npm install",
-    "dev": "npm run build && concurrently -n server,blockly -c green,yellow \"cd server && npm start\" \"cd $(grep KINDER_BLOCKLY_PATH server/.env | cut -d= -f2) && python -m kinder_blockly\"",
+    "dev": "concurrently -n server,client -c green,blue \"cd server && npm run dev\" \"cd client && npm run dev\"",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
     "start": "cd server && npm start",
